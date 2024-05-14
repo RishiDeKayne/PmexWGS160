@@ -1,16 +1,25 @@
-#all commands for Pmex WGS 200 project
+#all commands for Pmex WGS 160 project
 
 #raw data: /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07
 
-mkdir -p /hb/home/rdekayne/PmexWGS200 && cd /hb/home/rdekayne/PmexWGS200
+mkdir -p /hb/home/rdekayne/PmexWGS160 && cd /hb/home/rdekayne/PmexWGS160
 
 ##01_QC
 mkdir -p 01_QC && cd 01_QC
 
-## 01_H2S_QC_part1.sh 
+ls /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07/*.fastq.gz > samples.txt
+sed -i 's/\/hb\/groups\/kelley_lab\/rawdata\/poeciliid\/pmex_resequencing_2024_05_07\///g' samples.txt
+sed -i 's/_R1_001\.fastq\.gz//g' samples.txt
+grep -v "_R2_" samples.txt > sample_list.txt
+rm samples.txt
+
+wc -l sample_list.txt 
+#160 sample_list.txt
+
+## 01_QC_part1.sh 
 
 #!/bin/bash
-#SBATCH --job-name=fastqQC
+#SBATCH --job-name=fastp
 #SBATCH --time=0-12:00:00 # Wall clock time limit in Days-Hours:min:seconds
 #SBATCH --partition=128x24
 #SBATCH --output=QC.out # output file
@@ -22,16 +31,11 @@ mkdir -p 01_QC && cd 01_QC
 
 module load hb hb-gnu fastp
 
-cd /hb/home/rdekayne/01_H2S_QC
-ls ../data/*.fastq.gz > samples.txt
-sed -i 's/\.\.\/data\///g' samples.txt
-sed -i 's/_R1_001\.fastq\.gz//g' samples.txt
-grep -v "_R2_" samples.txt > sample_list.txt
-rm samples.txt
+cd /hb/home/rdekayne/PmexWGS160/01_QC
 
 cat sample_list.txt | while read sample
 do
-fastp -i /hb/home/rdekayne/data/${sample}_R1_001.fastq.gz -I /hb/home/rdekayne/data/${sample}_R2_001.fastq.gz -o /hb/home/rdekayne/01_H2S_QC/output_QC/${sample}_R1.out.fastq.gz -O /hb/home/rdekayne/01_H2S_QC/output_QC/${sample}_R2.out.fastq.gz -h ${sample}.html && touch /hb/home/rdekayne/01_H2S_QC/output_QC/${sample}.done
+fastp -i /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07/${sample}_R1_001.fastq.gz -I /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07/${sample}_R2_001.fastq.gz -o /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${sample}_R1.out.fastq.gz -O /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${sample}_R2.out.fastq.gz -h ${sample}.html && touch /hb/home/rdekayne/01_QC/output_QC/${sample}.done
 done
 
 touch all_samples.done
