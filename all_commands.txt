@@ -51,7 +51,7 @@ mamba install multiqc
 #!/bin/bash
 #SBATCH --job-name=multiqc
 #SBATCH --time=0-12:00:00 # Wall clock time limit in Days-Hours:min:seconds
-#SBATCH --partition=256×44
+#SBATCH --partition=256x44
 #SBATCH --output=QC.out # output file
 #SBATCH --error=QC.err # error file
 #SBATCH --ntasks=1 # Run 1 job
