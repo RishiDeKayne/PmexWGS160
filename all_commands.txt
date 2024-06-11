@@ -1,6 +1,12 @@
 #all commands for Pmex WGS 160 project
 
+#PART1 DATA
 #raw data: /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07
+
+#PART2 DATA
+#was here:
+/hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_11
+/hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_11
 
 mkdir -p /hb/home/rdekayne/PmexWGS160 && cd /hb/home/rdekayne/PmexWGS160
 
