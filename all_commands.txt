@@ -5,8 +5,13 @@
 
 #PART2 DATA
 #was here:
-/hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_11
-/hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_11
+/hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12
+/hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12
+
+rsync /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/EFR22* /hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12/
+rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/INFO /hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12/
+rsync /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/MX13* /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
+rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/INFO /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 
 mkdir -p /hb/home/rdekayne/PmexWGS160 && cd /hb/home/rdekayne/PmexWGS160
 
