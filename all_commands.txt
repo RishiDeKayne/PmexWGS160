@@ -8,12 +8,14 @@
 /hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12
 /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12
 
+#moving files to correct direcory
 rsync /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/EFR22* /hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12/
 rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/INFO /hb/groups/kelley_lab/rawdata/poeciliid/gambusia_resequencing_2024_06_12/
 rsync /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/MX13* /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/INFO /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/md5sums.txt /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 
+#checking files copied completely
 cd /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12
 grep "MX13" /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/md5sums.txt > ./pmexmd5.txt
 md5sum -c pmexmd5.txt
