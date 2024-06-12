@@ -81,3 +81,68 @@ done
 multiqc /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports/.
 
 touch all_samples2.done
+
+##03_QC
+ls /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/*.fastq.gz > samples2.txt
+sed -i 's/\/hb\/groups\/kelley_lab\/rawdata\/poeciliid\/pmex_resequencing_2024_06_12\///g' samples2.txt
+sed -i 's/_R1_001\.fastq\.gz//g' samples2.txt
+grep -v "_R2_" samples2.txt > sample_list2.txt
+rm samples2.txt
+
+wc -l sample_list2.txt 
+#
+
+## 01_QC_part3.sh 
+
+#!/bin/bash
+#SBATCH --job-name=fastp
+#SBATCH --time=0-12:00:00 # Wall clock time limit in Days-Hours:min:seconds
+#SBATCH --partition=Instruction
+#SBATCH --output=QC.out # output file
+#SBATCH --error=QC.err # error file
+#SBATCH --ntasks=1 # Run 1 job
+#SBATCH --ntasks-per-node=1 # One task per computer
+#SBATCH --cpus-per-task=2 # 2 CPUs per job
+#SBATCH --mem=4GB # Memory limit of 4GB
+
+module load hb hb-gnu fastp
+
+cd /hb/home/rdekayne/PmexWGS160/01_QC
+
+cat sample_list.txt | while read sample
+do
+fastp -i /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R1_001.fastq.gz -I /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R2_001.fastq.gz -o /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${sample}_R1.out.fastq.gz -O /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${sample}_R2.out.fastq.gz -h ${sample}.html && touch /hb/home/rdekayne/01_QC/output_QC/${sample}.done
+done
+
+touch all_samples.done
+
+#now to do fastqc and multiqc
+module load miniconda3.9
+conda activate /hb/home/rdekayne/envs/multiqc
+
+mkdir -p /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports2/
+
+## 01_QC_part4.sh 
+
+#!/bin/bash
+#SBATCH --job-name=multiqc
+#SBATCH --time=0-12:00:00 # Wall clock time limit in Days-Hours:min:seconds
+#SBATCH --partition=256x44
+#SBATCH --output=QC.out # output file
+#SBATCH --error=QC.err # error file
+#SBATCH --ntasks=1 # Run 1 job
+#SBATCH --ntasks-per-node=1 # One task per computer
+#SBATCH --cpus-per-task=2 # 2 CPUs per job
+#SBATCH --mem=4GB # Memory limit of 4GB
+
+module load hb hb-gnu
+
+cat sample_list2.txt | while read sample
+do
+fastqc -t 1 -o /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports2/ --noextract /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R1_001.fastq.gz
+fastqc -t 1 -o /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports2/ --noextract /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R2_001.fastq.gz
+done
+
+multiqc /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports2/.
+
+touch all_samples2.done
