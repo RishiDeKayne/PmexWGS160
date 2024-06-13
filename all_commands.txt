@@ -106,10 +106,10 @@ wc -l sample_list2.txt
 
 #!/bin/bash
 #SBATCH --job-name=fastp
-#SBATCH --time=0-12:00:00 # Wall clock time limit in Days-Hours:min:seconds
-#SBATCH --partition=Instruction
-#SBATCH --output=QC.out # output file
-#SBATCH --error=QC.err # error file
+#SBATCH --time=1-24:00:00 # Wall clock time limit in Days-Hours:min:seconds
+#SBATCH --partition=128x24
+#SBATCH --output=QCp.out # output file
+#SBATCH --error=QCp.err # error file
 #SBATCH --ntasks=1 # Run 1 job
 #SBATCH --ntasks-per-node=1 # One task per computer
 #SBATCH --cpus-per-task=2 # 2 CPUs per job
@@ -117,14 +117,17 @@ wc -l sample_list2.txt
 
 module load hb hb-gnu fastp
 
-cd /hb/home/rdekayne/PmexWGS160/01_QC
+cd /hb/home/rdekayne/PmexWGS160/02_QC
 
 cat sample_list2.txt | while read sample
 do
-fastp -i /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R1_001.fastq.gz -I /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R2_001.fastq.gz -o /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${sample}_R1.out.fastq.gz -O /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${sample}_R2.out.fastq.gz -h ${sample}.html && touch /hb/home/rdekayne/02_QC/output_QC/${sample}.done
+fastp -i /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R1_001.fastq.gz -I /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/${sample}_R2_001.fastq.gz -o /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${sample}_R1.out.fastq.gz -O /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${sample}_R2.out.fastq.gz -h ${sample}.html && touch /hb/home/rdekayne/PmexWGS160/02_QC/output_QC/${sample}.done
 done
 
 touch all_samples.done
+
+##run
+sbatch 02_QC_part1.sh 
 
 #now to do fastqc and multiqc
 module load miniconda3.9
@@ -137,7 +140,7 @@ mkdir -p /hb/home/rdekayne/PmexWGS160/01_QC/fastqc_reports/
 #!/bin/bash
 #SBATCH --job-name=multiqc
 #SBATCH --time=0-24:00:00 # Wall clock time limit in Days-Hours:min:seconds
-#SBATCH --partition=256x44
+#SBATCH --partition=128x24
 #SBATCH --output=QC.out # output file
 #SBATCH --error=QC.err # error file
 #SBATCH --ntasks=1 # Run 1 job
