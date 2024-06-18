@@ -15,6 +15,9 @@ rsync /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/MX13* /hb/groups/kelley_l
 rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/INFO /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 rsync -r /hb/groups/kelley_lab/rawdata/tmp/HJCW7DSXC/8226/md5sums.txt /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/
 
+rsync -r /hb/groups/kelley_lab/rawdata/tmp/HFWV3DSXC/8023/INFO /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_05_07
+
+
 #checking files copied completely
 cd /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12
 grep "MX13" /hb/groups/kelley_lab/rawdata/poeciliid/pmex_resequencing_2024_06_12/md5sums.txt > ./pmexmd5.txt
