@@ -217,6 +217,9 @@ multiqc /hb/home/rdekayne/PmexWGS160/03_QC/fastqc_reports1/.
 
 touch all_samples1.done
 
+mv multiqc_report.html multiqc_report_part1.html
+mv multiqc_data/ multiqc_data1/
+
 #run
 sbatch 03_QC_part1.sh 
 
@@ -248,6 +251,8 @@ touch all_samples2.done
 #run
 sbatch 03_QC_part2.sh 
 
+mv multiqc_report.html multiqc_report_part2.html
+mv multiqc_data/ multiqc_data2/
 
 
 
