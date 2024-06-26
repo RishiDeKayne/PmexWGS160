@@ -254,6 +254,7 @@ sbatch 03_QC_part2.sh
 mv multiqc_report.html multiqc_report_part2.html
 mv multiqc_data/ multiqc_data2/
 
+#########################################
 ##rename_files_part1.sh
 
 #!/bin/bash
@@ -269,7 +270,7 @@ mv multiqc_data/ multiqc_data2/
 
 module load hb hb-gnu
 
-for file in *.fastq.gz; do cp "$file" ../pmex_resequencing_2024_05_07_renamed/"${file/R1_001.fastq.gz/R1_001_part1.fastq.gz}"; done
+for file in *.fastq.gz; do cp "$file" ../pmex_resequencing_2024_05_07_renamed/"${file/001.fastq.gz/001_part1.fastq.gz}"; done
 
 touch all.done.txt
 
@@ -278,4 +279,24 @@ sbatch rename_files_part1.sh
 
 
 
+###rename_files_part2.sh
 
+#!/bin/bash
+#SBATCH --job-name=rename
+#SBATCH --time=0-24:00:00 # Wall clock time limit in Days-Hours:min:seconds
+#SBATCH --partition=128x24
+#SBATCH --output=rename.out # output file
+#SBATCH --error=rename.err # error file
+#SBATCH --ntasks=1 # Run 1 job
+#SBATCH --ntasks-per-node=1 # One task per computer
+#SBATCH --cpus-per-task=1 # 2 CPUs per job
+#SBATCH --mem=4GB # Memory limit of 4GB
+
+module load hb hb-gnu
+
+for file in *.fastq.gz; do cp "$file" ../pmex_resequencing_2024_06_12_renamed/"${file/001.fastq.gz/001_part2.fastq.gz}"; done
+
+touch all.done.txt
+
+##run
+sbatch rename_files_part2.sh
