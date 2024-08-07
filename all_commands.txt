@@ -254,7 +254,13 @@ sbatch 03_QC_part2.sh
 mv multiqc_report.html multiqc_report_part2.html
 mv multiqc_data/ multiqc_data2/
 
-#########################################
+
+#####################################
+#####################################
+#            NCBI UPLOAD
+#####################################
+#####################################
+
 ##rename_files_part1.sh
 
 #!/bin/bash
@@ -276,8 +282,6 @@ touch all.done.txt
 
 ##run
 sbatch rename_files_part1.sh
-
-
 
 ###rename_files_part2.sh
 
