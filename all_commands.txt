@@ -254,6 +254,71 @@ sbatch 03_QC_part2.sh
 mv multiqc_report.html multiqc_report_part2.html
 mv multiqc_data/ multiqc_data2/
 
+#####################################
+#####################################
+#            04_mapping - QC on post fastp data from run 1 and 2
+#####################################
+#####################################
+mkdir -p /hb/home/rdekayne/PmexWGS160/04_mapping && cd /hb/home/rdekayne/PmexWGS160/04_mapping
+
+#now ready for mapping for fastq files in /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed and /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2
+
+#want to first try with S Pmex assembly:
+cp /hb/groups/kelley_lab/poeciliids/hifi_genomes/04_structural_functional_annotation/01_annotate_repeats/02_Repeatmasker/m84066_230420_220836_s1.hifi_reads.bc1020.asm.bp.p_ctg.softmasked.fa /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa
+
+#index assembly
+module load samtools
+samtools faidx Pmex_S_ref.fa 
+module load bwa
+bwa index Pmex_S_ref.fa
+
+#and use samples in /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt
+
+#make scratch directory for sam/bam writing
+/hb/scratch/rdekayne/mapping/
+
+# 04.1_PmexWGS160_mapping.sh
+
+#!/bin/bash
+#SBATCH --job-name=mapping
+#SBATCH --time=0-24:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=mapping.%j.out # output file
+#SBATCH --error=mapping.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=16GB 
+
+module load hb hb-gnu bwa-mem2-2.2.1 sambamba
+
+ind=${SLURM_ARRAY_TASK_ID}
+indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${ind}p)
+
+#PART1
+# call bwa
+/hb/software/apps/bwa-mem2/gnu-2.2.1/bin/bwa-mem2 mem -t 24 /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${indiv_name}_L004_R1.out.fastq.gz /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed/${indiv_name}_L004_R2.out.fastq.gz > /hb/scratch/rdekayne/mapping/output.${indiv_name}_part1.raw.sam && touch ${indiv_name}.mapping1.done
+
+#run sambamba
+sambamba view -S /hb/scratch/rdekayne/mapping/output.${indiv_name}_part1.raw.sam -f bam -o /hb/scratch/rdekayne/mapping/output.${indiv_name}_part1.raw.bam -t 24 -l 9 && rm /hb/scratch/rdekayne/mapping/output.${indiv_name}_part1.raw.sam && touch ${indiv_name}.mapping2.done
+
+#PART2
+# call bwa
+/hb/software/apps/bwa-mem2/gnu-2.2.1/bin/bwa-mem2 mem -t 24 /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${indiv_name}_L004_R1.out.fastq.gz /hb/groups/kelley_lab/Rishi/PmexWGS160/data/fastp_processed2/${indiv_name}_L004_R2.out.fastq.gz > /hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.sam && touch ${indiv_name}.mapping3.done
+
+#run sambamba
+sambamba view -S /hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.sam -f bam -o /hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.bam -t 24 -l 9 && rm /hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.sam && touch ${indiv_name}.mapping4.done
+
+
+##submit
+sbatch --array=1 04.1_PmexWGS160_mapping.sh
+
+
+
+
+
+
+
+
 
 #####################################
 #####################################
