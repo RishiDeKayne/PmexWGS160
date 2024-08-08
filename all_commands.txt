@@ -282,7 +282,7 @@ bwa index Pmex_S_ref.fa
 #!/bin/bash
 #SBATCH --job-name=mapping
 #SBATCH --time=0-24:00:00
-#SBATCH --partition=128x24
+#SBATCH --partition=256x44
 #SBATCH --output=mapping.%j.out # output file
 #SBATCH --error=mapping.%j.err # error file
 #SBATCH -N 1
