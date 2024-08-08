@@ -314,6 +314,60 @@ sbatch --array=1 04.1_PmexWGS160_mapping.sh
 
 sbatch --array=2-160%12 04.1_PmexWGS160_mapping.sh
 
+mkdir /hb/home/rdekayne/PmexWGS160/04_mapping/bams
+mkdir /hb/scratch/rdekayne/mapping/tmp_bam
+
+# 04.2_PmexWGS160_processing.sh
+
+#!/bin/bash
+#SBATCH --job-name=mapping_processing
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=processing.%j.out # output file
+#SBATCH --error=processing.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=50GB 
+
+module load bwa-mem2/2.2.1 sambamba picard
+
+ind=${SLURM_ARRAY_TASK_ID}
+indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${ind}p)
+
+#PART1
+picard FixMateInformation I=/hb/scratch/rdekayne/mapping/output.${indiv_name}_part1.raw.bam VALIDATION_STRINGENCY=LENIENT OUTPUT=/hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part1.raw.bam
+
+sambamba sort /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part1.raw.bam -o /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part1.sorted.raw.bam -t 24 -m 50GB
+
+picard MarkDuplicates INPUT=/hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part1.sorted.raw.bam OUTPUT=/hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part1.sorted.dup.PmexS.bam METRICS_FILE=/hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part1.sorted.dup.PmexS.txt VALIDATION_STRINGENCY=LENIENT MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1024
+
+sambamba index /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part1.sorted.dup.PmexS.bam
+
+#PART2
+picard FixMateInformation I=/hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.bam VALIDATION_STRINGENCY=LENIENT OUTPUT=/hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part2.raw.bam
+
+sambamba sort /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part2.raw.bam -o /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part2.sorted.raw.bam -t 24 -m 50GB
+
+picard MarkDuplicates INPUT=/hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}_part2.sorted.raw.bam OUTPUT=/hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part2.sorted.dup.PmexS.bam METRICS_FILE=/hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part2.sorted.dup.PmexS.txt VALIDATION_STRINGENCY=LENIENT MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1024
+
+sambamba index /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part2.sorted.dup.PmexS.bam
+
+#now remove all intermediate files
+rm /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}.*
+
+touch ${indiv_name}.processing.done
+
+##submit
+sbatch --array=1 04.2_PmexWGS160_processing.sh
+
+
+
+
+
+
+
+
+
 
 
 
