@@ -312,6 +312,7 @@ sambamba view -S /hb/scratch/rdekayne/mapping/output.${indiv_name}_part2.raw.sam
 ##submit
 sbatch --array=1 04.1_PmexWGS160_mapping.sh
 
+sbatch --array=2-160%12 04.1_PmexWGS160_mapping.sh
 
 
 
