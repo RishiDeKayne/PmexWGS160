@@ -289,7 +289,7 @@ bwa index Pmex_S_ref.fa
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=16GB 
 
-module load hb hb-gnu bwa-mem2-2.2.1 sambamba
+module load hb hb-gnu bwa-mem2/2.2.1 sambamba
 
 ind=${SLURM_ARRAY_TASK_ID}
 indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${ind}p)
