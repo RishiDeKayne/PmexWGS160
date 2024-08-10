@@ -327,7 +327,7 @@ mkdir /hb/scratch/rdekayne/mapping/tmp_bam
 #SBATCH --error=processing.%j.err # error file
 #SBATCH -N 1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=50GB 
+#SBATCH --mem=40GB 
 
 module load bwa-mem2/2.2.1 sambamba picard
 
