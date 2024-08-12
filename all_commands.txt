@@ -391,13 +391,9 @@ mosdepth -n ${indiv_name}_combined.sorted.dup.PmexS.bam /hb/scratch/rdekayne/map
 ##run
 sbatch --array=1-160 04.3_PmexWGS160_combine_coverage.sh
 
-module load mosdepth
-#now make html file
-python ./plot-dist.py ./*global.dist.txt
-
 ls *.mosdepth.summary.txt > files.txt
 grep 'total' *.mosdepth.summary.txt | cut -f4 >> bam_raw_coverage.txt > coverage.txt
-paste files.txt coverage.txt > coverage_24.txt
+paste files.txt coverage.txt > coverage_160.txt
 rm files.txt coverage.txt
 
 #####################################
@@ -409,7 +405,9 @@ rm files.txt coverage.txt
 #make genotyping directory
 mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/ && cd /hb/home/rdekayne/PmexWGS160/05_genotyping/
 #and make a directory for the done-files
-mkdir /hb/home/rdekayne/05_genotyping/done_files
+mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/done_files
+#and make directory for raw vcf files
+mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_vcfs
 
 #prepare reference scaffold list
 ls /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa
@@ -418,7 +416,7 @@ ls /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa
 sort -k 2rn /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa.fai cut -f1 > /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list
 
 #make bam list too
-ls /hb/groups/kelley_lab/Rishi/processed_bams/*.bam > bam.list
+ls /hb/scratch/rdekayne/mapping/combined_bams/*.bam > bam.list
 
 ## 05.1_PmexWGS160_genotyping.sh
 
@@ -435,12 +433,12 @@ ls /hb/groups/kelley_lab/Rishi/processed_bams/*.bam > bam.list
 module load sambamba picard mosdepth samtools bcftools
 
 numb=${SLURM_ARRAY_TASK_ID}
-scaf_name=$(cat /hb/home/rdekayne/04_H2S_genotyping/scaf.list | sed -n ${numb}p)
+scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
 
-bcftools mpileup -O u -d 250 --skip-indels -f /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa --annotate FORMAT/DP --bam-list /hb/home/rdekayne/04_H2S_genotyping/bam.list -r "${scaf_name}" | bcftools call -m -f GQ -O v | bgzip > /hb/home/rdekayne/04_H2S_genotyping/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/04_H2S_genotyping/done_files/"${scaf_name}".raw.vcf.gz.done
+bcftools mpileup -O u -d 250 --skip-indels -f /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa --annotate FORMAT/DP --bam-list /hb/home/rdekayne/PmexWGS160/05_genotyping/bam.list -r "${scaf_name}" | bcftools call -m -f GQ -O v | bgzip > /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_vcfs/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/done_files/"${scaf_name}".raw.vcf.gz.done
 
 #run
-sbatch --array=1-25 04.1_H2S_genotyping.sh
+sbatch --array=1-115%16 05.1_PmexWGS160_genotyping.sh
 
 
 
