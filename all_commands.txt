@@ -406,17 +406,21 @@ rm files.txt coverage.txt
 #####################################
 #####################################
 
+#make genotyping directory
+mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/ && cd /hb/home/rdekayne/PmexWGS160/05_genotyping/
+#and make a directory for the done-files
+mkdir /hb/home/rdekayne/05_genotyping/done_files
+
 #prepare reference scaffold list
 ls /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa
 
 #want to get scaffolds in ascending order:
-sort -k 2rn /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa.fai cut -f1 > scaf.list
+sort -k 2rn /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa.fai cut -f1 > /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list
 
+#make bam list too
 ls /hb/groups/kelley_lab/Rishi/processed_bams/*.bam > bam.list
 
-mkdir /hb/home/rdekayne/04_H2S_genotyping/done_files
-
-## 04.1_H2S_genotyping.sh
+## 05.1_PmexWGS160_genotyping.sh
 
 #!/bin/bash
 #SBATCH --job-name=genotype
@@ -428,12 +432,12 @@ mkdir /hb/home/rdekayne/04_H2S_genotyping/done_files
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=10GB 
 
-module load hb hb-gnu bwa-mem2/bwa-mem2-2.2.1 sambamba picard mosdepth samtools bcftools
+module load sambamba picard mosdepth samtools bcftools
 
 numb=${SLURM_ARRAY_TASK_ID}
 scaf_name=$(cat /hb/home/rdekayne/04_H2S_genotyping/scaf.list | sed -n ${numb}p)
 
-bcftools mpileup -O u -d 250 --skip-indels -f /hb/groups/kelley_lab/reference_genomes/GCF_003331165.1_Xiphophorus_hellerii-4.1_genomic.fna --annotate FORMAT/DP --bam-list /hb/home/rdekayne/04_H2S_genotyping/bam.list -r "${scaf_name}" | bcftools call -m -f GQ -O v | bgzip > /hb/home/rdekayne/04_H2S_genotyping/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/04_H2S_genotyping/done_files/"${scaf_name}".raw.vcf.gz.done
+bcftools mpileup -O u -d 250 --skip-indels -f /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa --annotate FORMAT/DP --bam-list /hb/home/rdekayne/04_H2S_genotyping/bam.list -r "${scaf_name}" | bcftools call -m -f GQ -O v | bgzip > /hb/home/rdekayne/04_H2S_genotyping/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/04_H2S_genotyping/done_files/"${scaf_name}".raw.vcf.gz.done
 
 #run
 sbatch --array=1-25 04.1_H2S_genotyping.sh
