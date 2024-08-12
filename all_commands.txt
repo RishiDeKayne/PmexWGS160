@@ -430,7 +430,7 @@ ls /hb/scratch/rdekayne/mapping/combined_bams/*.bam > bam.list
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=10GB 
 
-module load sambamba picard mosdepth samtools bcftools
+module load htslib/1.17 sambamba picard mosdepth samtools bcftools
 
 numb=${SLURM_ARRAY_TASK_ID}
 scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
