@@ -322,7 +322,7 @@ mkdir /hb/scratch/rdekayne/mapping/tmp_bam
 #!/bin/bash
 #SBATCH --job-name=mapping_processing
 #SBATCH --time=0-12:00:00
-#SBATCH --partition=128x24
+#SBATCH --partition=256x44
 #SBATCH --output=processing.%j.out # output file
 #SBATCH --error=processing.%j.err # error file
 #SBATCH -N 1
@@ -358,10 +358,35 @@ rm /hb/scratch/rdekayne/mapping/tmp_bam/${indiv_name}.*
 touch ${indiv_name}.processing.done
 
 ##submit
-sbatch --array=1 04.2_PmexWGS160_processing.sh
+sbatch --array=1-160 04.2_PmexWGS160_processing.sh
 
 
+mkdir -p /hb/home/rdekayne/PmexWGS160/04_mapping/mosdepth && cd /hb/home/rdekayne/PmexWGS160/04_mapping/mosdepth
 
+mkdir /hb/scratch/rdekayne/mapping/combined_bams
+
+# 04.3_PmexWGS160_combine_coverage.sh
+
+#!/bin/bash
+#SBATCH --job-name=mosdepth
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=256x44
+#SBATCH --output=depth.%j.out # output file
+#SBATCH --error=depth.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load samtools sambamba picard mosdepth
+
+ind=${SLURM_ARRAY_TASK_ID}
+indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${ind}p)
+
+samtools merge -o /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part1.sorted.dup.PmexS.bam /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part2.sorted.dup.PmexS.bam 
+
+mosdepth -n ${indiv_name}_combined.sorted.dup.PmexS.bam /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam && touch ${indiv_name}.mosdepth.done 
+
+sbatch --array=1-160 04.3_PmexWGS160_combine_coverage.sh
 
 
 
