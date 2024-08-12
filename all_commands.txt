@@ -386,9 +386,17 @@ samtools merge -o /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combi
 
 mosdepth -n ${indiv_name}_combined.sorted.dup.PmexS.bam /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam && touch ${indiv_name}.mosdepth.done 
 
+##run
 sbatch --array=1-160 04.3_PmexWGS160_combine_coverage.sh
 
+module load mosdepth
+#now make html file
+python ./plot-dist.py ./*global.dist.txt
 
+ls *.mosdepth.summary.txt > files.txt
+grep 'total' *.mosdepth.summary.txt | cut -f4 >> bam_raw_coverage.txt > coverage.txt
+paste files.txt coverage.txt > coverage_24.txt
+rm files.txt coverage.txt
 
 
 
