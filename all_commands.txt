@@ -256,7 +256,7 @@ mv multiqc_data/ multiqc_data2/
 
 #####################################
 #####################################
-#            04_mapping - QC on post fastp data from run 1 and 2
+#            04_mapping 
 #####################################
 #####################################
 mkdir -p /hb/home/rdekayne/PmexWGS160/04_mapping && cd /hb/home/rdekayne/PmexWGS160/04_mapping
@@ -400,7 +400,43 @@ grep 'total' *.mosdepth.summary.txt | cut -f4 >> bam_raw_coverage.txt > coverage
 paste files.txt coverage.txt > coverage_24.txt
 rm files.txt coverage.txt
 
+#####################################
+#####################################
+#            05_genotyping 
+#####################################
+#####################################
 
+#prepare reference scaffold list
+ls /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa
+
+#want to get scaffolds in ascending order:
+sort -k 2rn /hb/home/rdekayne/PmexWGS160/04_mapping/Pmex_S_ref.fa.fai cut -f1 > scaf.list
+
+ls /hb/groups/kelley_lab/Rishi/processed_bams/*.bam > bam.list
+
+mkdir /hb/home/rdekayne/04_H2S_genotyping/done_files
+
+## 04.1_H2S_genotyping.sh
+
+#!/bin/bash
+#SBATCH --job-name=genotype
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=geno.%j.out # output file
+#SBATCH --error=geno.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load hb hb-gnu bwa-mem2/bwa-mem2-2.2.1 sambamba picard mosdepth samtools bcftools
+
+numb=${SLURM_ARRAY_TASK_ID}
+scaf_name=$(cat /hb/home/rdekayne/04_H2S_genotyping/scaf.list | sed -n ${numb}p)
+
+bcftools mpileup -O u -d 250 --skip-indels -f /hb/groups/kelley_lab/reference_genomes/GCF_003331165.1_Xiphophorus_hellerii-4.1_genomic.fna --annotate FORMAT/DP --bam-list /hb/home/rdekayne/04_H2S_genotyping/bam.list -r "${scaf_name}" | bcftools call -m -f GQ -O v | bgzip > /hb/home/rdekayne/04_H2S_genotyping/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/04_H2S_genotyping/done_files/"${scaf_name}".raw.vcf.gz.done
+
+#run
+sbatch --array=1-25 04.1_H2S_genotyping.sh
 
 
 
