@@ -396,6 +396,31 @@ grep 'total' *.mosdepth.summary.txt | cut -f4 >> bam_raw_coverage.txt > coverage
 paste files.txt coverage.txt > coverage_160.txt
 rm files.txt coverage.txt
 
+#now run flatstat
+mkdir -p /hb/home/rdekayne/PmexWGS160/04_mapping/flagstat_output && cd /hb/home/rdekayne/PmexWGS160/04_mapping/flagstat_output
+
+## 04.4_PmexWGS160_flagstat.sh
+
+#!/bin/bash
+#SBATCH --job-name=mosdepth
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=256x44
+#SBATCH --output=depth.%j.out # output file
+#SBATCH --error=depth.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load samtools sambamba picard mosdepth
+
+ind=${SLURM_ARRAY_TASK_ID}
+indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${ind}p)
+
+samtools flagstat /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam && touch ${indiv_name}_combined.sorted.dup.PmexS.bam.done
+
+##run
+sbatch --array=1-160%20 04.4_PmexWGS160_flagstat.sh
+
 #####################################
 #####################################
 #            05_genotyping 
