@@ -384,6 +384,8 @@ indiv_name=$(cat /hb/home/rdekayne/PmexWGS160/02_QC/sample_list2.txt | sed -n ${
 
 samtools merge -o /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part1.sorted.dup.PmexS.bam /hb/home/rdekayne/PmexWGS160/04_mapping/bams/${indiv_name}_part2.sorted.dup.PmexS.bam 
 
+sambamba index /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam 
+
 mosdepth -n ${indiv_name}_combined.sorted.dup.PmexS.bam /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combined.sorted.dup.PmexS.bam && touch ${indiv_name}.mosdepth.done 
 
 ##run
