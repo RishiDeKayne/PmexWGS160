@@ -496,6 +496,32 @@ bcftools reheader --samples /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_vcfs/
 #run
 sbatch --array=1-115%16 05.2_PmexWGS160_genotype_rename_filt.sh
 
+## 05.3_PmexWGS160_index.sh 
+
+#!/bin/bash
+#SBATCH --job-name=genotype
+#SBATCH --time=0-24:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=geno.%j.out # output file
+#SBATCH --error=geno.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load htslib/1.17 sambamba picard mosdepth samtools bcftools
+
+numb=${SLURM_ARRAY_TASK_ID}
+scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
+
+bcftools index /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz
+
+##run
+sbatch --array=1-115 05.3_PmexWGS160_index.sh 
+
+
+
+
+
 ## 05.3_PmexWGS160_genotype_filt.sh 
 
 #!/bin/bash
