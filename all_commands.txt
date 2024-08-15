@@ -517,8 +517,8 @@ bcftools filter -Ou /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs
 
 ##run
 sbatch --array=3 05.3_PmexWGS160_genotype_filt.sh
-
-sbatch --array=1-115%16 05.3_PmexWGS160_genotype_filt.sh
+sbatch --array=1-2 05.3_PmexWGS160_genotype_filt.sh
+sbatch --array=4-115%16 05.3_PmexWGS160_genotype_filt.sh
 
 
 ## 05.3_PmexWGS160_concat_and_filt.sh
