@@ -513,9 +513,11 @@ module load htslib/1.17 sambamba picard mosdepth samtools bcftools
 numb=${SLURM_ARRAY_TASK_ID}
 scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
 
-bcftools filter -Oz /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -O u | bcftools filter -e 'AN < 2' | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
+bcftools filter -Ou /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -e 'AN < 2' | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
 
 ##run
+sbatch --array=3 05.3_PmexWGS160_genotype_filt.sh
+
 sbatch --array=1-115%16 05.3_PmexWGS160_genotype_filt.sh
 
 
