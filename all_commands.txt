@@ -493,10 +493,31 @@ scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${num
 
 bcftools reheader --samples /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_vcfs/reheader.txt -o /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_vcfs/"${scaf_name}".raw.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/done_files/"${scaf_name}".done
 
-bcftools filter -Oz /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -O u | bcftools filter -e 'AN < 2' | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
-
 #run
 sbatch --array=1-115%16 05.2_PmexWGS160_genotype_rename_filt.sh
+
+## 05.3_PmexWGS160_genotype_filt.sh 
+
+#!/bin/bash
+#SBATCH --job-name=genotype
+#SBATCH --time=0-24:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=geno.%j.out # output file
+#SBATCH --error=geno.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=30GB 
+
+module load htslib/1.17 sambamba picard mosdepth samtools bcftools
+
+numb=${SLURM_ARRAY_TASK_ID}
+scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
+
+bcftools filter -Oz /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -O u | bcftools filter -e 'AN < 2' | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
+
+##run
+sbatch --array=1-115%16 05.3_PmexWGS160_genotype_filt.sh
+
 
 ## 05.3_PmexWGS160_concat_and_filt.sh
 
