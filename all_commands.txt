@@ -421,6 +421,11 @@ samtools flagstat /hb/scratch/rdekayne/mapping/combined_bams/${indiv_name}_combi
 ##run
 sbatch --array=1-160%20 04.4_PmexWGS160_flagstat.sh
 
+#now replace bam files in home dir with those combined and in scratch
+cd /hb/home/rdekayne/PmexWGS160/04_mapping/bams/
+rm /hb/home/rdekayne/PmexWGS160/04_mapping/bams/MX*
+cp /hb/scratch/rdekayne/mapping/combined_bams/* .
+
 #####################################
 #####################################
 #            05_genotyping 
