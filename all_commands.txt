@@ -519,10 +519,7 @@ bcftools index /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${s
 sbatch --array=1-115 05.3_PmexWGS160_index.sh 
 
 
-
-
-
-## 05.3_PmexWGS160_genotype_filt.sh 
+## 05.4_PmexWGS160_genotype_filt.sh 
 
 #!/bin/bash
 #SBATCH --job-name=genotype
@@ -539,15 +536,15 @@ module load htslib/1.17 sambamba picard mosdepth samtools bcftools
 numb=${SLURM_ARRAY_TASK_ID}
 scaf_name=$(cat /hb/home/rdekayne/PmexWGS160/04_mapping/scaf.list | sed -n ${numb}p)
 
-bcftools filter -Ou /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -e 'AN < 2' | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz --temp-dir /hb/scratch/rdekayne/genotype_temp/ && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
+mkdir -p /hb/scratch/rdekayne/genotype_temp_"${scaf_name}"
+
+bcftools filter -Ou /hb/home/rdekayne/PmexWGS160/05_genotyping/raw_reheader_vcfs/"${scaf_name}".reheader.raw.vcf.gz -e 'FORMAT/DP < 7 | FORMAT/GQ < 30' --set-GTs . -e 'AN < 2' | bcftools sort -Oz --temp-dir /hb/scratch/rdekayne/genotype_temp_"${scaf_name}" -o /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt_mindepth7_minqual30.vcf.gz && touch /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/"${scaf_name}"_filt.done
 
 ##run
-sbatch --array=3 05.3_PmexWGS160_genotype_filt.sh
-sbatch --array=1-2 05.3_PmexWGS160_genotype_filt.sh
-sbatch --array=4-115%16 05.3_PmexWGS160_genotype_filt.sh
+sbatch --array=1-115%16 05.4_PmexWGS160_genotype_filt.sh
 
 
-## 05.3_PmexWGS160_concat_and_filt.sh
+## 05.5_PmexWGS160_concat_and_filt.sh
 
 #!/bin/bash
 #SBATCH --job-name=filt
@@ -562,20 +559,22 @@ sbatch --array=4-115%16 05.3_PmexWGS160_genotype_filt.sh
 module load hb hb-gnu bwa-mem2/bwa-mem2-2.2.1 sambamba picard mosdepth samtools bcftools
 
 mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs
+mkdir -p /hb/scratch/rdekayne/genotype_temp_concat
+mkdir -p /hb/scratch/rdekayne/genotype_temp_concat_filt
 
 ls /hb/home/rdekayne/PmexWGS160/05_genotyping/filt_vcfs/*_filt_mindepth7_minqual30.vcf.gz > vcf_to_merge.txt
 
-bcftools concat -Ou -f vcf_to_merge.txt | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30.vcf.gz
+bcftools concat -Ou -f vcf_to_merge.txt | bcftools sort -Oz --temp-dir /hb/scratch/rdekayne/genotype_temp_concat -o /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30.vcf.gz
 
 #no missing filter for SNPs
-bcftools filter -Oz /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30.vcf.gz -e 'INFO/MAC < 1 | AN < 320' | bcftools view -m2 -M2 -v snps | bcftools sort -Oz -o /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz
+bcftools filter -Oz /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30.vcf.gz -e 'INFO/MAC < 1 | AN < 320' | bcftools view -m2 -M2 -v snps | bcftools sort -Oz --temp-dir /hb/scratch/rdekayne/genotype_temp_concat_filt -o /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz
 
 bcftools view -H /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz | wc -l
 
 touch genotype_stats.done
 
 ##run
-sbatch 05.3_PmexWGS160_concat_and_filt.sh
+sbatch 05.5_PmexWGS160_concat_and_filt.sh
 
 
 
