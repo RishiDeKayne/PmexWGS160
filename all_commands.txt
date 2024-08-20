@@ -554,14 +554,14 @@ sbatch --array=1-115%16 05.4_PmexWGS160_genotype_filt.sh
 #!/bin/bash
 #SBATCH --job-name=filt
 #SBATCH --time=0-12:00:00
-#SBATCH --partition=128x24
+#SBATCH --partition=256x44
 #SBATCH --output=geno_filt.%j.out # output file
 #SBATCH --error=geno_filt.%j.err # error file
 #SBATCH -N 1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=60GB 
 
-module load hb hb-gnu bwa-mem2/bwa-mem2-2.2.1 sambamba picard mosdepth samtools bcftools
+module load htslib/1.17 sambamba picard mosdepth samtools bcftools
 
 mkdir -p /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs
 mkdir -p /hb/scratch/rdekayne/genotype_temp_concat
