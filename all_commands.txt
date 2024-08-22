@@ -614,9 +614,51 @@ sbatch 06.1_PCA_unfilt.sh
 
 #5494680 variants and 160 people pass filters and QC.
 
+#####################################
+#####################################
+#            07_LD
+#####################################
+#####################################
 
-#LD
-plink --bfile 160_unfilt_out --matrix --out Out
+mkdir -p /hb/home/rdekayne/PmexWGS160/07_LD && cd /hb/home/rdekayne/PmexWGS160/07_LD
+
+#07.1_LD.sh
+
+#!/bin/bash
+#SBATCH --job-name=LD
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=pca.%j.out # output file
+#SBATCH --error=pca.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load plink bcftools
+
+cd /hb/home/rdekayne/PmexWGS160/07_LD
+
+#mkdir -p /hb/scratch/rdekayne/bcf_LD
+
+#bcftools index /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz
+
+#bcftools view /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz --regions ptg000001l | bcftools sort -Oz --temp-dir /hb/scratch/rdekayne/bcf_LD -o /hb/home/rdekayne/PmexWGS160/07_LD/ptg000001l_mindepth7_minqual30_mac1_AN320.vcf.gz
+
+plink --vcf /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz --double-id --allow-extra-chr \
+--set-missing-var-ids @:# \
+--maf 0.01 --geno 0.1 --mind 0.5 --chr ptg000001l \
+--thin 0.1 -r2 gz --ld-window 100 --ld-window-kb 1000 \
+--ld-window-r2 0 \
+--make-bed --out 160_LD_out
+
+touch /hb/home/rdekayne/PmexWGS160/07_LD/LD_pca.done
+
+##run
+sbatch 07.1_LD.sh
+
+# run mark python script
+ld_decay_calc.py -i cichlid_chr1.ld.gz -o cichlid_chr1
+
 
 #####################################
 #####################################
