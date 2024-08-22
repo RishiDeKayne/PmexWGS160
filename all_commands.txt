@@ -656,9 +656,34 @@ touch /hb/home/rdekayne/PmexWGS160/07_LD/LD_pca.done
 ##run
 sbatch 07.1_LD.sh
 
-# run mark python script
-ld_decay_calc.py -i cichlid_chr1.ld.gz -o cichlid_chr1
+#23330 variants and 160 people pass filters and QC.
 
+module load miniconda3
+conda create -n py27 python=2.7 ipykernel
+conda activate py27
+
+# run mark python script
+python ./ld_decay_calc.py -i 160_LD_out.ld.gz -o 160_LD_chr1
+
+
+#07.2_LD.sh
+
+#!/bin/bash
+#SBATCH --job-name=LD
+#SBATCH --time=0-12:00:00
+#SBATCH --partition=128x24
+#SBATCH --output=pca.%j.out # output file
+#SBATCH --error=pca.%j.err # error file
+#SBATCH -N 1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10GB 
+
+module load plink bcftools
+
+plink --vcf /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mindepth7_minqual30_mac1_AN320.vcf.gz --double-id --allow-extra-chr --set-missing-var-ids @:# --r2 inter-chr gz dprime yes-really --ld-window-r2 0 --chr ptg000001l --thin 0.1 --make-bed --out 160_LD_out2
+
+##run
+sbatch 07.2_LD.sh
 
 #####################################
 #####################################
