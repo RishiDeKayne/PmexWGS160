@@ -614,6 +614,10 @@ sbatch 06.1_PCA_unfilt.sh
 
 #5494680 variants and 160 people pass filters and QC.
 
+
+#LD
+plink --bfile 160_unfilt_out --matrix --out Out
+
 #####################################
 #####################################
 #            NCBI UPLOAD
