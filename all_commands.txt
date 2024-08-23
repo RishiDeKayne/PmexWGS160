@@ -685,6 +685,16 @@ plink --vcf /hb/home/rdekayne/PmexWGS160/05_genotyping/concat_vcfs/PmexWGS160_mi
 ##run
 sbatch 07.2_LD.sh
 
+
+module load miniconda3
+conda create -n LD
+conda activate LD
+mamba install -c r r-essentials
+mamba install -c r r-scico
+mamba install -c r r-ggplot2
+mamba install -c r r-ggrastr
+mamba install -c r r-data.table
+
 #####################################
 #####################################
 #            NCBI UPLOAD
