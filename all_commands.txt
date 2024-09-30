@@ -1,4 +1,13 @@
+#Rishi De-Kayne 2024
 #all commands for Pmex WGS 160 project
+# Sections:
+# 1. QC
+# 2. QC
+# 3. QC
+# 4. Mapping
+# 5. Genotyping
+# 6. PCA
+# 7. LD
 
 #####################################
 #####################################
